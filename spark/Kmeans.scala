@@ -1,6 +1,3 @@
-/**
-  * Don't import another package besides below packages
-  */
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
@@ -8,10 +5,6 @@ import scala.collection.mutable.Map
 import scala.math.sqrt
 
 object Kmeans {
-  /**
-    * This is main function
-    * You can create more functions as you want
-    */
   def calculateDistance(p1 : Array[Double], p2 : Array[Double]) : Double = {
     def square (x : Double) = { x*x }
     return sqrt(square(p1(0)-p2(0)) + square(p1(1)-p2(1)) + square(p1(2)-p2(2)))
@@ -46,19 +39,11 @@ object Kmeans {
       System.exit(1)
     }
 
-    /**
-      * Don't modify following initialization phase
-      */
     val sparkConf = new SparkConf().setAppName("KMeans").set("spark.cores.max", "3")
     val sc = new SparkContext(sparkConf)
     // val lines is base RDD
     val lines = sc.textFile(args(0))
     val mode = args(2).toInt
-    /**
-      * From here, you can modify codes.
-      * you can use given data structure, or another data type and RDD operation
-      * you must utilize more than 5 types of RDD operations
-      */
 
     var K: Int = 0
     var centroids: Map[Int, Array[Double]] = Map()
@@ -67,7 +52,7 @@ object Kmeans {
 
     // Set initial centroids
     if (mode == 0) {
-      // randomly sample K data points
+      // Randomly sample K data points
       K = args(3).toInt
       val randomPoints = points.takeSample(false, 3, System.nanoTime.toInt)
       for (i <- 1 to K) {
@@ -75,17 +60,14 @@ object Kmeans {
       }
     }
     else {
-      // user-defined centroids
-      // you can use another built-in data type besides Map
+      // User-defined centroids
       centroids = Map(1 -> Array(5, 1.2, -0.8), 2 -> Array(-3.2, -1.1, 3.0), 3 -> Array(-2.1, 5.1, 1.1))
       K = centroids.size
     }
-    /**
-      * Don't change termination condition
-      * sum of moved centroid distances
-      */
-    var finalPoints = points.map(p => (1, p)).collect //= new Array[(Int, Array[Double])](points.count)
+
+    var finalPoints = points.map(p => (1, p)).collect
     var change : Double = 100
+   
     while(change > 0.001) {
       val clusteredPoints = points.map(p => (searchClosestCentroid(centroids, p), p))
       clusteredPoints.cache()
